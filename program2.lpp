@@ -1,0 +1,229 @@
+%{
+    #include"Lexeme.h" 
+    using namespace std;
+    Lexeme token;
+    int column = 1;
+    int line = 1;
+%}
+%option outfile="program2_lex.cpp"
+%option noyywrap
+
+%x COMMENTSTATE
+%%
+
+[\+\-!] {
+  //Unary Operator
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return UNARYOP; 
+}
+
+(==)|(!=)|(<=)|(>=)|(<)|(>) {
+  //Relation Operator
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return RELATIONOP; 
+}
+
+(\+)|(-)|(\|\|) {
+  //Sum Operator
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return SUMOP; 
+}
+
+(\*)|(\/)|(\%)|(&&) {
+  //Product Operator
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return PRODUCTOP; 
+}
+
+(=) {
+  //Assignment Operator
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return ASSIGNOP; 
+}
+
+(class) {
+  //class Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return CLASS; 
+}
+
+(this) {
+  //this Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return THIS; 
+}
+(if) {
+  //if Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return IF; 
+}
+(else) {
+  //else Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return ELSE; 
+}
+(while) {
+  //while Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return WHILE; 
+}
+(return) {
+  //return Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return RETURN; 
+}
+(print) {
+  //print Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return PRINT; 
+}
+
+(read) {
+  //read Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return READ; 
+}
+
+(void) {
+  //void Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return VOID; 
+}
+(new) {
+  //new Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return NEW; 
+}
+
+(null) {
+  //null Keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+  
+  return NULLKEYWORD; 
+}
+
+[.,;""’\(\)\[\]] {
+  //Puncutation
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  
+  return PUNCTUATION;
+}
+
+[{}] {
+  //Block
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  
+  return BLOCK;
+}
+
+[0-9]+ {
+  //Number
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  
+  return INT; 
+}
+
+([a-zA-Z]|_)([a-zA-Z]|[0-9]|_)* {
+  //identifier
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  
+  return WORD; 
+}
+
+
+
+(" ")+ {
+    
+    setToken(yytext, line, column);
+    column+= token.value.length();
+    
+    return SPACE; 
+}
+(\t)+ {
+    
+    setToken(yytext, line, column);
+    column+= token.value.length()*8;
+    return TAB;
+}
+
+\n {
+  
+  setToken(yytext, line, column);    
+  column = 1;
+  line++;
+  
+  return NEWLINE; 
+}
+. {
+  
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  
+  return ERR; 
+}
+
+\/\*.*\*\/ {
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  return COMMENT; 
+}
+
+
+
+
+[0-9]+\.[0-9]+ {
+    
+    setToken(yytext, line, column);
+    column+= token.value.length();
+    
+    return FLOAT; 
+}
+[0-9]+((\.[0-9]+))?(e|E)(\+|-)?[0-9]+ {
+    
+    setToken(yytext, line, column);
+    column+= token.value.length();
+    
+    return SCI; 
+}
+
+
+
+
+
+%%
+

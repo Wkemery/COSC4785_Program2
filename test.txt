@@ -1,0 +1,37 @@
+>= <= != == < > + - ! % || && % /
+class myclassname
+if (statement)
+{
+	do some code
+}
+else {
+ do something else}
+
+while(boolean statement)
+{
+more code
+}
+
+return 0;
+
+print("somestuff")
+void methodname(int parameter1, myType parameter2) //comment behind other stuff
+
+myType = new myType();
+
+return null;
+
+myarray[] = 10;
+{}
+()
+// Here is a singal line comment
+
+/*
+multiline comment
+*/
+
+/*
+*
+* another multiline comment
+*
+*/
