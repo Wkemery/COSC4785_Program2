@@ -25,13 +25,9 @@ myarray[] = 10;
 {}
 ()
 // Here is a singal line comment
+/**************
 
-/*
-multiline comment
-*/
 
-/*
-*
-* another multiline comment
-*
-*/
+
+8 here is a multiline comment *************/
+A_4THeCoun@t+Not

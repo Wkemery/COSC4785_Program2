@@ -27,19 +27,20 @@
 #define VOID 108
 #define NEW 109
 #define NULLKEYWORD 110
-
+#define INT 111
 
 #define PUNCTUATION 12
 #define BLOCK 13
-#define INT 14
-#define WORD 17
+#define NUM 14
+#define IDENTIFIER 17
 #define SPACE 10
 #define TAB 11
 #define NEWLINE 18
 
 #define STARTCOMMENT 24
 #define COMMENT 25
-#define ERR 666
+#define ERR 666 
+#define IGNORE 987
 
 #define FLOAT 15
 #define SCI 16

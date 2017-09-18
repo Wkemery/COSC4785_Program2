@@ -20,31 +20,31 @@ int main()
 {
   //for printing stuff out for now
   map<int, string> pTable;
-  pTable.insert(std::pair<int, string>(50, "UNARYOP"));
-  pTable.insert(std::pair<int, string>(51, "RELATOP"));
-  pTable.insert(std::pair<int, string>(52, "SUMOP"));
-  pTable.insert(std::pair<int, string>(53, "PRODOP"));
-  pTable.insert(std::pair<int, string>(54, "ASSIGOP"));
+  pTable.insert(std::pair<int, string>(UNARYOP, "UNARYOP"));
+  pTable.insert(std::pair<int, string>(RELATIONOP, "RELATOP"));
+  pTable.insert(std::pair<int, string>(SUMOP, "SUMOP"));
+  pTable.insert(std::pair<int, string>(PRODUCTOP, "PRODOP"));
+  pTable.insert(std::pair<int, string>(ASSIGNOP, "ASSIGOP"));
   
-  pTable.insert(std::pair<int, string>(100, "CLASS"));
-  pTable.insert(std::pair<int, string>(101, "THIS"));
-  pTable.insert(std::pair<int, string>(102, "IF"));
-  pTable.insert(std::pair<int, string>(103, "ELSE"));
-  pTable.insert(std::pair<int, string>(104, "WHILE"));
-  pTable.insert(std::pair<int, string>(105, "RETURN"));
-  pTable.insert(std::pair<int, string>(106, "PRINT"));
-  pTable.insert(std::pair<int, string>(107, "READ"));
-  pTable.insert(std::pair<int, string>(108, "VOID"));
-  pTable.insert(std::pair<int, string>(109, "NEW"));
-  pTable.insert(std::pair<int, string>(110, "NULL"));
+  pTable.insert(std::pair<int, string>(CLASS, "CLASS"));
+  pTable.insert(std::pair<int, string>(THIS, "THIS"));
+  pTable.insert(std::pair<int, string>(IF, "IF"));
+  pTable.insert(std::pair<int, string>(ELSE, "ELSE"));
+  pTable.insert(std::pair<int, string>(WHILE, "WHILE"));
+  pTable.insert(std::pair<int, string>(RETURN, "RETURN"));
+  pTable.insert(std::pair<int, string>(PRINT, "PRINT"));
+  pTable.insert(std::pair<int, string>(PRINT, "READ"));
+  pTable.insert(std::pair<int, string>(VOID, "VOID"));
+  pTable.insert(std::pair<int, string>(NEW, "NEW"));
+  pTable.insert(std::pair<int, string>(NULLKEYWORD, "NULL"));
   
-  pTable.insert(std::pair<int, string>(12, "PUNC"));
-  pTable.insert(std::pair<int, string>(13, "BLOCK"));
-  pTable.insert(std::pair<int, string>(14, "INT"));
-  pTable.insert(std::pair<int, string>(17, "WORD"));
-  pTable.insert(std::pair<int, string>(11, "TAB"));
-  pTable.insert(std::pair<int, string>(18, "NEWLINE"));
-  pTable.insert(std::pair<int, string>(666, "ERR"));
+  pTable.insert(std::pair<int, string>(PUNCTUATION, "PUNC"));
+  pTable.insert(std::pair<int, string>(BLOCK, "BLOCK"));
+  pTable.insert(std::pair<int, string>(INT, "INT"));
+  pTable.insert(std::pair<int, string>(IDENTIFIER, "ID"));
+  pTable.insert(std::pair<int, string>(TAB, "TAB"));
+  pTable.insert(std::pair<int, string>(NEWLINE, "NEWLINE"));
+  pTable.insert(std::pair<int, string>(ERR, "ERR"));
   
   pTable.insert(std::pair<int, string>(25, "COMM"));
 
@@ -70,7 +70,7 @@ int main()
             cout << "Line" << "\t" << "Column" << "\t" << "Type" << "\t\t" << "Length" 
             << "\t" << "Value" << endl;
         }
-        if(rtn!= SPACE)
+        if((rtn!= SPACE) && (rtn!= IGNORE) && (rtn!=COMMENT))
       {
         cout << token.line << "\t";
         cout << token.column << "\t";

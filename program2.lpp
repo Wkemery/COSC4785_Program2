@@ -8,10 +8,21 @@
 %option outfile="program2_lex.cpp"
 %option noyywrap
 
-%x COMMENTSTATE
+WHITESPACE ([\t \n])
+WORD (([a-zA-Z]|_)([a-zA-Z]|[0-9]|_)*)
+UNARYOPS [\+\-!] 
+RELATIONOPS (==)|(!=)|(<=)|(>=)|(<)|(>) 
+SUMOPS (\+)|(-)|(\|\|)
+PRODUCTOPS (\*)|(\/)|(\%)|(&&)
+
+%x ERROR
+%x COMMENTS
+%x ENDCOMMENTS
 %%
 
-[\+\-!] {
+
+
+{UNARYOPS} {
   //Unary Operator
   setToken(yytext, line, column);
   column+= strlen(yytext);
@@ -19,7 +30,7 @@
   return UNARYOP; 
 }
 
-(==)|(!=)|(<=)|(>=)|(<)|(>) {
+{RELATIONOPS} {
   //Relation Operator
   setToken(yytext, line, column);
   column+= strlen(yytext);
@@ -27,7 +38,7 @@
   return RELATIONOP; 
 }
 
-(\+)|(-)|(\|\|) {
+{SUMOPS} {
   //Sum Operator
   setToken(yytext, line, column);
   column+= strlen(yytext);
@@ -35,7 +46,7 @@
   return SUMOP; 
 }
 
-(\*)|(\/)|(\%)|(&&) {
+{PRODUCTOPS} {
   //Product Operator
   setToken(yytext, line, column);
   column+= strlen(yytext);
@@ -70,7 +81,6 @@
   //if Keyword
   setToken(yytext, line, column);
   column+= strlen(yytext);
-  
   return IF; 
 }
 (else) {
@@ -94,6 +104,7 @@
   
   return RETURN; 
 }
+
 (print) {
   //print Keyword
   setToken(yytext, line, column);
@@ -133,6 +144,18 @@
   return NULLKEYWORD; 
 }
 
+(int) {
+  //int keyword
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+}
+
+\/\/.*\n {
+  // single line comment
+  setToken(yytext, line, column);
+  column+= strlen(yytext);
+}
+
 [.,;""’\(\)\[\]] {
   //Puncutation
   setToken(yytext, line, column);
@@ -154,7 +177,7 @@
   setToken(yytext, line, column);
   column+= token.value.length();
   
-  return INT; 
+  return NUM; 
 }
 
 ([a-zA-Z]|_)([a-zA-Z]|[0-9]|_)* {
@@ -162,10 +185,8 @@
   setToken(yytext, line, column);
   column+= token.value.length();
   
-  return WORD; 
+  return IDENTIFIER; 
 }
-
-
 
 (" ")+ {
     
@@ -189,21 +210,62 @@
   
   return NEWLINE; 
 }
+
 . {
-  
-  setToken(yytext, line, column);
-  column+= token.value.length();
-  
-  return ERR; 
+  //found an error char, enter error state, ignore captured input
+  yyless(0);
+  BEGIN(ERROR); 
+  return IGNORE; 
 }
 
-\/\*.*\*\/ {
+
+<ERROR>.{WHITESPACE}|{SUMOPS}|{RELATIONOPS}|{PRODUCTOPS}|{UNARYOPS}  {
+  // single char error
   setToken(yytext, line, column);
   column+= token.value.length();
+  BEGIN(INITIAL);
+  return ERR;
+}
+
+<ERROR>.{WORD}  {
+  //multi char error
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  BEGIN(INITIAL);
+  return ERR;
+}
+
+(\/\*) {
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  BEGIN(COMMENTS);
   return COMMENT; 
 }
 
+<COMMENTS>([^*])* {
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  BEGIN(ENDCOMMENTS);
+  return COMMENT; 
+}
 
+<COMMENTS>\* {
+yyless(0);
+BEGIN(ENDCOMMENTS);
+return COMMENT;
+}
+
+<ENDCOMMENTS>\*\/ {
+  setToken(yytext, line, column);
+  column+= token.value.length();
+  BEGIN(INITIAL);
+  return COMMENT;
+}
+
+<ENDCOMMENTS>\* {
+  BEGIN(COMMENTS);
+  return COMMENT;
+}
 
 
 [0-9]+\.[0-9]+ {
