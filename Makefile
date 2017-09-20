@@ -5,22 +5,26 @@
 #
 # COSC 4785, Homework 1
 # 
-# this will compile and generate an executable from program1.cpp
+# this will compile and generate an executable from program2.cpp and program2.lpp
 ##############################
 
-CC=g++
-CFLAGS=-ggdb -Wall
+CXX=g++
+CXXFLAGS=-ggdb -Wall
+FLEX=flex++
+FLEXFLAGS=--warn
 
-.PHONY: clean
+.PHONY: clean tar
 
+program2: program2.cpp program2_lex.cpp Lexeme.cpp Lexeme.h
+	${CXX} ${CXXFLAGS} program2.cpp program2_lex.cpp Lexeme.cpp -o program2
 
-all: flex program1
+program2_lex.cpp: program2.lpp
+	${FLEX} ${FLEXFLAGS} program2.lpp
 
-flex: program2.lpp
-	flex++ --warn program2.lpp
-
-program1: program2.cpp program2_lex.cpp Lexeme.cpp Lexeme.h
-	${CC} ${CFLAGS} program2.cpp program2_lex.cpp Lexeme.cpp -o program2
+tar: program2.cpp program2.lpp Lexeme.cpp Lexeme.h Makefile
+	tar -cf wemery_HW2.tar program2.cpp program2.lpp Lexeme.cpp Lexeme.h \
+	Makefile
 
 clean: 
-	/bin/rm -f *.o program2 program2_lex.cpp
+	/bin/rm -f *.o core.* program2 program2_lex.cpp wemery_HW2.tar
+

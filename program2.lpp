@@ -1,12 +1,27 @@
 %{
+  /*
+   * program2.lpp
+   * Author: Wyatt Emery
+   * Date: SEP 20, 2017
+   *
+   * COSC 4785, Homework2
+   *
+   */
+  
+  /* A note: 
+   *  I used states for comments because i could not figure out how to do a 
+   *  regex that didnt match completed multiline comments as incomplete 
+   *  multiline comments. It added two extra states and a few extra rules, but
+   *  I don't think it's too messy
+   */
     #include"Lexeme.h" 
     using namespace std;
     Lexeme token;
     int column = 1;
-    int line = 1;
 %}
 %option outfile="program2_lex.cpp"
 %option noyywrap
+%option yylineno
 
 WHITESPACE ([\t \n])
 WORD (([a-zA-Z]|_)([a-zA-Z]|[0-9]|_)*)
@@ -14,17 +29,23 @@ UNARYOPS [\+\-!]
 RELATIONOPS (==)|(!=)|(<=)|(>=)|(<)|(>) 
 SUMOPS (\+)|(-)|(\|\|)
 PRODUCTOPS (\*)|(\/)|(\%)|(&&)
+PUNCTUATION [.,;’\(\)\[\]{}]
+
+INVALIDCHARS [^0-9A-Za-z_!=<>+\-*\/;.,|&{}()% \t\n\[\]]
+
+VALIDNONWORD [0-9!=<>+\-*\/;.,|&{}()% \t\n[]]
 
 %x ERROR
 %x COMMENTS
 %x ENDCOMMENTS
+
 %%
 
 
 
 {UNARYOPS} {
   //Unary Operator
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return UNARYOP; 
@@ -32,7 +53,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 {RELATIONOPS} {
   //Relation Operator
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return RELATIONOP; 
@@ -40,7 +61,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 {SUMOPS} {
   //Sum Operator
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return SUMOP; 
@@ -48,7 +69,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 {PRODUCTOPS} {
   //Product Operator
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return PRODUCTOP; 
@@ -56,7 +77,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (=) {
   //Assignment Operator
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return ASSIGNOP; 
@@ -64,7 +85,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (class) {
   //class Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return CLASS; 
@@ -72,34 +93,34 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (this) {
   //this Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return THIS; 
 }
 (if) {
   //if Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   return IF; 
 }
 (else) {
   //else Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return ELSE; 
 }
 (while) {
   //while Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return WHILE; 
 }
 (return) {
   //return Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return RETURN; 
@@ -107,7 +128,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (print) {
   //print Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return PRINT; 
@@ -115,7 +136,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (read) {
   //read Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return READ; 
@@ -123,14 +144,15 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (void) {
   //void Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return VOID; 
 }
+
 (new) {
   //new Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return NEW; 
@@ -138,7 +160,7 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (null) {
   //null Keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
   
   return NULLKEYWORD; 
@@ -146,146 +168,135 @@ PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 
 (int) {
   //int keyword
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
 }
 
 \/\/.*\n {
   // single line comment
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= strlen(yytext);
 }
 
-[.,;""’\(\)\[\]] {
+[.,;’\(\)\[\]{}] {
   //Puncutation
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= token.value.length();
   
   return PUNCTUATION;
 }
 
-[{}] {
-  //Block
-  setToken(yytext, line, column);
-  column+= token.value.length();
-  
-  return BLOCK;
-}
-
 [0-9]+ {
   //Number
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= token.value.length();
   
   return NUM; 
 }
 
-([a-zA-Z]|_)([a-zA-Z]|[0-9]|_)* {
+{WORD} {
   //identifier
-  setToken(yytext, line, column);
+  setToken(yytext, yylineno, column);
   column+= token.value.length();
   
   return IDENTIFIER; 
 }
 
-(" ")+ {
+[ ]+ {
     
-    setToken(yytext, line, column);
+    setToken(yytext, yylineno, column);
     column+= token.value.length();
     
     return SPACE; 
 }
+
 (\t)+ {
     
-    setToken(yytext, line, column);
+    setToken(yytext, yylineno, column);
     column+= token.value.length()*8;
-    return TAB;
+    return SPACE;
 }
 
 \n {
   
-  setToken(yytext, line, column);    
+  setToken(yytext, yylineno, column);    
   column = 1;
-  line++;
   
-  return NEWLINE; 
-}
-
-. {
-  //found an error char, enter error state, ignore captured input
-  yyless(0);
-  BEGIN(ERROR); 
-  return IGNORE; 
-}
-
-
-<ERROR>.{WHITESPACE}|{SUMOPS}|{RELATIONOPS}|{PRODUCTOPS}|{UNARYOPS}  {
-  // single char error
-  setToken(yytext, line, column);
-  column+= token.value.length();
-  BEGIN(INITIAL);
-  return ERR;
-}
-
-<ERROR>.{WORD}  {
-  //multi char error
-  setToken(yytext, line, column);
-  column+= token.value.length();
-  BEGIN(INITIAL);
-  return ERR;
+  return SPACE; 
 }
 
 (\/\*) {
-  setToken(yytext, line, column);
-  column+= token.value.length();
+  column+= strlen(yytext);
   BEGIN(COMMENTS);
-  return COMMENT; 
+  return IGNORE; 
 }
 
-<COMMENTS>([^*])* {
-  setToken(yytext, line, column);
+{INVALIDCHARS}+ {
+  //found an error char, enter error state, ignore captured input
+  yyless(0);
+  BEGIN(ERROR); 
+  
+  return IGNORE; 
+}
+
+<ERROR>({INVALIDCHARS}+{VALIDNONWORD})  {
+  // Error char(s) followed valid non word character
+  yyless(strlen(yytext - 1)); //put the last char back into the stream
+  setToken(yytext, yylineno, column);
+  
   column+= token.value.length();
+  BEGIN(INITIAL);
+  return ERR;
+}
+
+
+<ERROR>({INVALIDCHARS}+({WORD}|{INVALIDCHARS}+)*)  {
+  //Error char(s) followed valid word
+  setToken(yytext, yylineno, column);
+  column+= token.value.length();
+  BEGIN(INITIAL);
+  return ERR;
+}
+
+<COMMENTS>([^\*\n])* {
+  column+= strlen(yytext);
   BEGIN(ENDCOMMENTS);
-  return COMMENT; 
+  return IGNORE; 
 }
 
 <COMMENTS>\* {
-yyless(0);
-BEGIN(ENDCOMMENTS);
-return COMMENT;
+  yyless(0);
+  BEGIN(ENDCOMMENTS);
+  return IGNORE;
+}
+
+<COMMENTS>\n {
+  column = 1;
+  return IGNORE; 
+}
+
+<COMMENTS>(\/\*) {
+  column+= strlen(yytext);
+  return IGNORE; 
+}
+
+<ENDCOMMENTS>\n {
+  column = 1;
+  BEGIN(COMMENTS);
+  return IGNORE; 
 }
 
 <ENDCOMMENTS>\*\/ {
-  setToken(yytext, line, column);
-  column+= token.value.length();
+  column+= strlen(yytext);
   BEGIN(INITIAL);
-  return COMMENT;
+  return IGNORE;
 }
 
 <ENDCOMMENTS>\* {
+  column+= strlen(yytext);
   BEGIN(COMMENTS);
-  return COMMENT;
+  return IGNORE;
 }
-
-
-[0-9]+\.[0-9]+ {
-    
-    setToken(yytext, line, column);
-    column+= token.value.length();
-    
-    return FLOAT; 
-}
-[0-9]+((\.[0-9]+))?(e|E)(\+|-)?[0-9]+ {
-    
-    setToken(yytext, line, column);
-    column+= token.value.length();
-    
-    return SCI; 
-}
-
-
-
-
 
 %%
 

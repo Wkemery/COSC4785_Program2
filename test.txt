@@ -26,8 +26,10 @@ myarray[] = 10;
 ()
 // Here is a singal line comment
 /**************
+//test
+8 here is a multiline comment *************/ A_4THeCoun@t+Not
+word@#partoferror-varname
+###
+^^^^^^^^^^
 
-
-
-8 here is a multiline comment *************/
-A_4THeCoun@t+Not
+@
