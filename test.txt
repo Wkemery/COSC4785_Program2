@@ -33,3 +33,12 @@ word@#partoferror-varname
 ^^^^^^^^^^
 
 @
+
+&error;
+|Error,
+'error45error
+=id
+"error(
+@error)
+
+

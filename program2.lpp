@@ -9,10 +9,19 @@
    */
   
   /* A note: 
-   *  I used states for comments because i could not figure out how to do a 
+   *  I used states for comments because I could not figure out how to do a 
    *  regex that didnt match completed multiline comments as incomplete 
    *  multiline comments. It added two extra states and a few extra rules, but
    *  I don't think it's too messy
+   * 
+   * 
+   * <ERROR>(.+({WORD}|{INVALIDCHARS}+)*)  {
+   * //Error char(s) followed valid word
+   * setToken(yytext, yylineno, column);
+   * column+= token.value.length();
+   * BEGIN(INITIAL);
+   * return ERR;
+}
    */
     #include"Lexeme.h" 
     using namespace std;
@@ -29,11 +38,15 @@ UNARYOPS [\+\-!]
 RELATIONOPS (==)|(!=)|(<=)|(>=)|(<)|(>) 
 SUMOPS (\+)|(-)|(\|\|)
 PRODUCTOPS (\*)|(\/)|(\%)|(&&)
-PUNCTUATION [.,;’\(\)\[\]{}]
+PUNCTUATION [.,;()\[\]{}]
 
-INVALIDCHARS [^0-9A-Za-z_!=<>+\-*\/;.,|&{}()% \t\n\[\]]
+INVALIDCHARS2 [^0-9A-Za-z_!=<>+\-*\/;.,|&{}()% \t\n\[\]]
 
-VALIDNONWORD [0-9!=<>+\-*\/;.,|&{}()% \t\n[]]
+INVALIDCHARS [^0-9A-Z_\(==\)\(!=\)\(<=\)\(>=\)\(&&\)\(\|\|\)<>+\-\*\/!;.,{}()% \t\n\[\]]
+
+VALIDNONWORD [!=<>+\-*\/;.,|&{}()% \t\n[]]
+
+VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCTUATION}
 
 %x ERROR
 %x COMMENTS
@@ -231,7 +244,7 @@ VALIDNONWORD [0-9!=<>+\-*\/;.,|&{}()% \t\n[]]
   return IGNORE; 
 }
 
-{INVALIDCHARS}+ {
+. {
   //found an error char, enter error state, ignore captured input
   yyless(0);
   BEGIN(ERROR); 
@@ -239,7 +252,7 @@ VALIDNONWORD [0-9!=<>+\-*\/;.,|&{}()% \t\n[]]
   return IGNORE; 
 }
 
-<ERROR>({INVALIDCHARS}+{VALIDNONWORD})  {
+<ERROR>(.+{VALIDNONWORD})  {
   // Error char(s) followed valid non word character
   yyless(strlen(yytext - 1)); //put the last char back into the stream
   setToken(yytext, yylineno, column);
@@ -249,14 +262,6 @@ VALIDNONWORD [0-9!=<>+\-*\/;.,|&{}()% \t\n[]]
   return ERR;
 }
 
-
-<ERROR>({INVALIDCHARS}+({WORD}|{INVALIDCHARS}+)*)  {
-  //Error char(s) followed valid word
-  setToken(yytext, yylineno, column);
-  column+= token.value.length();
-  BEGIN(INITIAL);
-  return ERR;
-}
 
 <COMMENTS>([^\*\n])* {
   column+= strlen(yytext);
