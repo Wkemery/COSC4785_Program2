@@ -40,11 +40,11 @@ SUMOPS (\+)|(-)|(\|\|)
 PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 PUNCTUATION [.,;()\[\]{}]
 
-INVALIDCHARS [^0-9A-Za-z_!=<>+\-*\/;.,{}()% \t\n\[\]]
+INVALIDCHARS [^!=<>+\-*\/;.,{}()% \t\n\[\]&]
 
 INVALIDCHARS2 [^0-9A-Z_\(==\)\(!=\)\(<=\)\(>=\)\(&&\)\(\|\|\)<>+\-\*\/!;.,{}()% \t\n\[\]]
 
-VALIDNONWORD [!=<>+\-*\/;.,{}()% \t\n[]]|(&&)|(\|\|)
+VALIDNONWORD [!=<>+\-*\/;.,{}()% \t\n\[\]&]|(&&)
 
 VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCTUATION}
 
@@ -52,6 +52,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 %x COMMENTS
 %x ENDCOMMENTS
 %x MAYBERR
+%x ERR2
 %%
 
 
@@ -246,14 +247,14 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 
 {INVALIDCHARS} {
   //found an error char, enter error state, ignore captured input
-  
+  cout << "yytext:" << yytext << "end" <<endl; 
   //if matched a | or a & check to see if maybe valid.
-  string a = yytext;
-  if((a=="|") || (a=="&"))
+  //string a = yytext;
+  /*if((a=="|") || (a=="&"))
   {
     BEGIN(MAYBERR);
     yyless(0);
-  }
+  }*/
   yyless(0);
   BEGIN(ERROR); 
   
@@ -262,21 +263,34 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 
 <ERROR>({INVALIDCHARS}+{VALIDNONWORD})  {
   // Error char(s) followed valid non word character
-  yyless(strlen(yytext) - 1); //put the last char back into the stream
+  cout << "yytext2:" << yytext << "end" << endl;
+  string a = yytext;
+
+  if(a.substr(a.length() - 2, 2)  == "&&")
+  {
+     yyless(strlen(yytext) - 2);
+  }
+  else  if(a[a.length() - 1] == '&')
+  {
+    cout << "made it to if" << endl;
+    yyless(0); 
+    BEGIN(ERR2);
+    return IGNORE;
+  }
+  else yyless(strlen(yytext) - 1); //put the last char back into the stream
   setToken(yytext, yylineno, column);
-  
+     
   column+= token.value.length();
   BEGIN(INITIAL);
   return ERR;
 }
 
-
-<ERROR>({INVALIDCHARS}+({WORD}|{INVALIDCHARS}+)*)  {
-  //Error char(s) followed valid word
+<ERR2>({INVALIDCHARS}+(&{INVALIDCHARS}*)+{VALIDNONWORD}) {
   setToken(yytext, yylineno, column);
+  
   column+= token.value.length();
   BEGIN(INITIAL);
-  return ERR;
+  return ERR; 
 }
 
 <MAYBERR>&& {
