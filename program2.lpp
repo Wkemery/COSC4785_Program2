@@ -244,7 +244,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
   return IGNORE; 
 }
 
-. {
+{INVALIDCHARS}+ {
   //found an error char, enter error state, ignore captured input
   yyless(0);
   BEGIN(ERROR); 
@@ -252,11 +252,20 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
   return IGNORE; 
 }
 
-<ERROR>(.+{VALIDNONWORD})  {
+<ERROR>({INVALIDCHARS}+{VALIDNONWORD})  {
   // Error char(s) followed valid non word character
   yyless(strlen(yytext - 1)); //put the last char back into the stream
   setToken(yytext, yylineno, column);
   
+  column+= token.value.length();
+  BEGIN(INITIAL);
+  return ERR;
+}
+
+
+<ERROR>({INVALIDCHARS}+({WORD}|{INVALIDCHARS}+)*)  {
+  //Error char(s) followed valid word
+  setToken(yytext, yylineno, column);
   column+= token.value.length();
   BEGIN(INITIAL);
   return ERR;
