@@ -36,9 +36,14 @@ word@#partoferror-varname
 
 &error;
 |Error,
+||notError
+&&NotError
 'error45error
 =id
 "error(
 @error)
-
+@error|errcontinued
+@err||errnotcontinued
+@err&errcountinued
+@err&&errnotcontinued
 

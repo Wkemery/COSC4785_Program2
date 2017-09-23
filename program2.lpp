@@ -40,18 +40,18 @@ SUMOPS (\+)|(-)|(\|\|)
 PRODUCTOPS (\*)|(\/)|(\%)|(&&)
 PUNCTUATION [.,;()\[\]{}]
 
-INVALIDCHARS [^0-9A-Za-z_!=<>+\-*\/;.,\(||\)\(&&\){}()% \t\n\[\]]
+INVALIDCHARS [^0-9A-Za-z_!=<>+\-*\/;.,{}()% \t\n\[\]]
 
 INVALIDCHARS2 [^0-9A-Z_\(==\)\(!=\)\(<=\)\(>=\)\(&&\)\(\|\|\)<>+\-\*\/!;.,{}()% \t\n\[\]]
 
-VALIDNONWORD [!=<>+\-*\/;.,\(||\)\(&&\){}()% \t\n[]]
+VALIDNONWORD [!=<>+\-*\/;.,{}()% \t\n[]]|(&&)|(\|\|)
 
 VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCTUATION}
 
 %x ERROR
 %x COMMENTS
 %x ENDCOMMENTS
-
+%x MAYBERR
 %%
 
 
@@ -244,8 +244,16 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
   return IGNORE; 
 }
 
-{INVALIDCHARS}+ {
+{INVALIDCHARS} {
   //found an error char, enter error state, ignore captured input
+  
+  //if matched a | or a & check to see if maybe valid.
+  string a = yytext;
+  if((a=="|") || (a=="&"))
+  {
+    BEGIN(MAYBERR);
+    yyless(0);
+  }
   yyless(0);
   BEGIN(ERROR); 
   
@@ -254,7 +262,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 
 <ERROR>({INVALIDCHARS}+{VALIDNONWORD})  {
   // Error char(s) followed valid non word character
-  yyless(strlen(yytext - 1)); //put the last char back into the stream
+  yyless(strlen(yytext) - 1); //put the last char back into the stream
   setToken(yytext, yylineno, column);
   
   column+= token.value.length();
@@ -271,6 +279,21 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
   return ERR;
 }
 
+<MAYBERR>&& {
+  //not an error, is an operator
+  setToken(yytext, yylineno, column);
+  column+= token.value.length();
+  BEGIN(INITIAL);
+  return PRODUCTOP;
+}
+
+<MAYBERR>\|\| {
+  //not an error, is an || op
+  setToken(yytext, yylineno, column);
+  column+= token.value.length();
+  BEGIN(INITIAL);
+  return SUMOP;
+}
 
 <COMMENTS>([^\*\n])* {
   column+= strlen(yytext);
