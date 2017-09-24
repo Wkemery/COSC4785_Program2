@@ -33,7 +33,7 @@ word@#partoferror-varname
 ^^^^^^^^^^
 
 @
-
+&&&
 &error;
 |Error,
 ||notError
@@ -46,4 +46,4 @@ word@#partoferror-varname
 @err||errnotcontinued
 @err&errcountinued
 @err&&errnotcontinued
-
+@err&errcont&errcont&&&rdone

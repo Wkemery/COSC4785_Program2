@@ -44,15 +44,16 @@ INVALIDCHARS [^!=<>+\-*\/;.,{}()% \t\n\[\]&]
 
 INVALIDCHARS2 [^0-9A-Z_\(==\)\(!=\)\(<=\)\(>=\)\(&&\)\(\|\|\)<>+\-\*\/!;.,{}()% \t\n\[\]]
 
-VALIDNONWORD [!=<>+\-*\/;.,{}()% \t\n\[\]&]|(&&)
+VALIDNONWORD [!=<>+\-*\/;.,{}()% \t\n\[\]&]|(&&)|(\|\|)
+
+INVALIDNONWORD [^!=<>+\-*\/;.,{}()% \t\n\[\]&]
 
 VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCTUATION}
 
 %x ERROR
 %x COMMENTS
 %x ENDCOMMENTS
-%x MAYBERR
-%x ERR2
+%x ERROR2
 %%
 
 
@@ -245,69 +246,65 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
   return IGNORE; 
 }
 
-{INVALIDCHARS} {
+. {
   //found an error char, enter error state, ignore captured input
-  cout << "yytext:" << yytext << "end" <<endl; 
-  //if matched a | or a & check to see if maybe valid.
-  //string a = yytext;
-  /*if((a=="|") || (a=="&"))
-  {
-    BEGIN(MAYBERR);
-    yyless(0);
-  }*/
+  //cout << "yytext:" << yytext << "end" <<endl; 
   yyless(0);
   BEGIN(ERROR); 
   
   return IGNORE; 
 }
 
-<ERROR>({INVALIDCHARS}+{VALIDNONWORD})  {
-  // Error char(s) followed valid non word character
-  cout << "yytext2:" << yytext << "end" << endl;
-  string a = yytext;
+<ERROR>{INVALIDNONWORD}+ {
+  //cout << "yytext:" << yytext << endl;
+  yymore();
+  BEGIN(ERROR2);
+  return IGNORE;
+}
 
-  if(a.substr(a.length() - 2, 2)  == "&&")
-  {
-     yyless(strlen(yytext) - 2);
-  }
-  else  if(a[a.length() - 1] == '&')
-  {
-    cout << "made it to if" << endl;
-    yyless(0); 
-    BEGIN(ERR2);
-    return IGNORE;
-  }
-  else yyless(strlen(yytext) - 1); //put the last char back into the stream
-  setToken(yytext, yylineno, column);
-     
-  column+= token.value.length();
+
+<ERROR>& {
+  //cout << "in err3 &" << endl;
+  yymore();
+  return IGNORE;
+}
+
+<ERROR>.|\n {
+  //cout << "HERE" << endl;
+  yyless(strlen(yytext) - 1);
   BEGIN(INITIAL);
+  setToken(yytext, yylineno, column);
+  column+= token.value.length();
+  return ERR;
+
+}
+ 
+<ERROR2>(&&) {
+  //cout << "yytext4:" << yytext << endl;
+  yyless(strlen(yytext) - 2);
+  BEGIN(INITIAL);
+  setToken(yytext, yylineno, column);
+  column+= token.value.length();
   return ERR;
 }
 
-<ERR2>({INVALIDCHARS}+(&{INVALIDCHARS}*)+{VALIDNONWORD}) {
-  setToken(yytext, yylineno, column);
-  
-  column+= token.value.length();
-  BEGIN(INITIAL);
-  return ERR; 
+<ERROR2>& {
+  //cout << "in & one" << endl;
+  yymore();
+  BEGIN(ERROR);
+  return IGNORE;
 }
 
-<MAYBERR>&& {
-  //not an error, is an operator
+
+<ERROR2>.|\n {
+  //cout << "yytextother:" << yytext << endl;
+  yyless(strlen(yytext) - 1);
+  BEGIN(INITIAL);
   setToken(yytext, yylineno, column);
   column+= token.value.length();
-  BEGIN(INITIAL);
-  return PRODUCTOP;
+  return ERR;
 }
 
-<MAYBERR>\|\| {
-  //not an error, is an || op
-  setToken(yytext, yylineno, column);
-  column+= token.value.length();
-  BEGIN(INITIAL);
-  return SUMOP;
-}
 
 <COMMENTS>([^\*\n])* {
   column+= strlen(yytext);
