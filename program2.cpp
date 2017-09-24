@@ -12,6 +12,7 @@
 #include<string>
 #include<map>
 #include<cstdlib>
+#include<iomanip>
 #include"Lexeme.h"
 using namespace std;
 
@@ -38,9 +39,17 @@ int main()
   pTable.insert(std::pair<int, string>(NEW, "NEW"));
   pTable.insert(std::pair<int, string>(NULLKEYWORD, "NULL"));
   pTable.insert(std::pair<int, string>(INT, "INT"));
-  
-  
-  pTable.insert(std::pair<int, string>(PUNCTUATION, "PUNC"));
+    
+  pTable.insert(std::pair<int, string>(DOTOP, "DOTOP"));
+  pTable.insert(std::pair<int, string>(COMMA, "COMMA"));
+  pTable.insert(std::pair<int, string>(SEMICO, "SEMICO"));
+  pTable.insert(std::pair<int, string>(LPAREN, "LPAREN"));
+  pTable.insert(std::pair<int, string>(RPAREN, "RPAREN"));  
+  pTable.insert(std::pair<int, string>(LBRACK, "LBRACK"));
+  pTable.insert(std::pair<int, string>(RBRACK, "RBRACK"));
+  pTable.insert(std::pair<int, string>(LBRACE, "LBRACE"));
+  pTable.insert(std::pair<int, string>(RBRACE, "RBRACE"));
+          
   pTable.insert(std::pair<int, string>(IDENTIFIER, "ID"));
   pTable.insert(std::pair<int, string>(ERR, "ERR"));
   pTable.insert(std::pair<int, string>(NUM, "NUM"));
@@ -57,16 +66,24 @@ int main()
       if(firstScan)
       {
         firstScan = false;
-        cout << "Line" << "\t" << "Column" << "\t" << "Type" << "\t\t" 
-        << "Length" << "\t" << "Value" << endl;
+        cout << setw(10) << "Line" << setw(10) << "Column" << setw(20)  << "Token" 
+        << setw(20) << "Value" << endl;
       }
-      if((rtn!= SPACE) && (rtn!= IGNORE))
+      if(rtn == ERR)
       {
-        cout << token.line << "\t";
-        cout << token.column << "\t";
-        cout << pTable[rtn] << "\t\t";
-        cout << token.value.length() << "\t";
-        cout << token.value;
+        cout << setw(10) << token.line;
+        cout << setw(10) << token.column << " " ;
+        cout << setw(20) << token.value;
+        if(token.value.length() == 1) cout << setw(20) << "Single Char Err";
+        else cout << setw(20) << "Multi Char Err";
+        cout << endl;
+      }
+      else if((rtn!= SPACE) && (rtn!= IGNORE))
+      {
+        cout << setw(10) << token.line;
+        cout << setw(10) << token.column;
+        cout << setw(20) << pTable[rtn];
+        if((rtn < 100) || (rtn > 150)) cout << setw(20) << token.value;
         cout << endl;   
       }
       

@@ -15,13 +15,6 @@
    *  I don't think it's too messy
    * 
    * 
-   * <ERROR>(.+({WORD}|{INVALIDCHARS}+)*)  {
-   * //Error char(s) followed valid word
-   * setToken(yytext, yylineno, column);
-   * column+= token.value.length();
-   * BEGIN(INITIAL);
-   * return ERR;
-}
    */
     #include"Lexeme.h" 
     using namespace std;
@@ -42,13 +35,9 @@ PUNCTUATION [.,;()\[\]{}]
 
 INVALIDCHARS [^!=<>+\-*\/;.,{}()% \t\n\[\]&]
 
-INVALIDCHARS2 [^0-9A-Z_\(==\)\(!=\)\(<=\)\(>=\)\(&&\)\(\|\|\)<>+\-\*\/!;.,{}()% \t\n\[\]]
-
 VALIDNONWORD [!=<>+\-*\/;.,{}()% \t\n\[\]&]|(&&)|(\|\|)
 
-INVALIDNONWORD [^!=<>+\-*\/;.,{}()% \t\n\[\]&]
-
-VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCTUATION}
+INVALIDNONWORD [^!=<>+\-*\/;.,{}()% \t\n\[\]&\|]
 
 %x ERROR
 %x COMMENTS
@@ -56,12 +45,10 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 %x ERROR2
 %%
 
-
-
 {UNARYOPS} {
   //Unary Operator
   setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  column++;
   
   return UNARYOP; 
 }
@@ -69,7 +56,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 {RELATIONOPS} {
   //Relation Operator
   setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  column++;
   
   return RELATIONOP; 
 }
@@ -77,7 +64,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 {SUMOPS} {
   //Sum Operator
   setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  column++;
   
   return SUMOP; 
 }
@@ -85,120 +72,184 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 {PRODUCTOPS} {
   //Product Operator
   setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  column++;
   
   return PRODUCTOP; 
 }
 
 (=) {
   //Assignment Operator
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column++;
   
   return ASSIGNOP; 
 }
 
+"." {
+  //Dot  Operator
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return DOTOP; 
+}
+
+(,) {
+  //comma
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return COMMA; 
+}
+
+(;) {
+  //Semi colon
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return SEMICO; 
+}
+
+"(" {
+  //Left Paren
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return LPAREN; 
+}
+
+")" {
+  //Right Paren
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return RPAREN; 
+}
+
+"\[" {
+  //Left Bracket
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return LBRACK; 
+}
+
+"\]" {
+  //Rigth bracket
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return RBRACK; 
+}
+
+"{" {
+  // Left Brace
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return LBRACE; 
+}
+
+"}" {
+  //Right Brace
+  setToken(NULL, yylineno, column);
+  column++;
+  
+  return RBRACE; 
+}
+
 (class) {
   //class Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+=yyleng;
   
   return CLASS; 
 }
 
 (this) {
   //this Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return THIS; 
 }
 (if) {
   //if Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   return IF; 
 }
 (else) {
   //else Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return ELSE; 
 }
 (while) {
   //while Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return WHILE; 
 }
 (return) {
   //return Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return RETURN; 
 }
 
 (print) {
   //print Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return PRINT; 
 }
 
 (read) {
   //read Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return READ; 
 }
 
 (void) {
   //void Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return VOID; 
 }
-
+:
 (new) {
   //new Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return NEW; 
 }
 
 (null) {
   //null Keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
   
   return NULLKEYWORD; 
 }
 
 (int) {
   //int keyword
-  setToken(yytext, yylineno, column);
-  column+= strlen(yytext);
+  setToken(NULL, yylineno, column);
+  column+= yyleng;
 }
 
 \/\/.*\n {
   // single line comment
   setToken(yytext, yylineno, column);
   column+= strlen(yytext);
-}
-
-[.,;’\(\)\[\]{}] {
-  //Puncutation
-  setToken(yytext, yylineno, column);
-  column+= token.value.length();
-  
-  return PUNCTUATION;
 }
 
 [0-9]+ {
@@ -263,7 +314,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 }
 
 
-<ERROR>& {
+<ERROR>&|\| {
   //cout << "in err3 &" << endl;
   yymore();
   return IGNORE;
@@ -279,7 +330,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
 
 }
  
-<ERROR2>(&&) {
+<ERROR2>(&&)|(\|\|) {
   //cout << "yytext4:" << yytext << endl;
   yyless(strlen(yytext) - 2);
   BEGIN(INITIAL);
@@ -288,7 +339,7 @@ VALIDNONWORD2 {WHITESPACE}|{UNARYOPS}|{RELATIONOPS}|{SUMOPS}|{PRODUCTOPS}|{PUNCT
   return ERR;
 }
 
-<ERROR2>& {
+<ERROR2>&|\| {
   //cout << "in & one" << endl;
   yymore();
   BEGIN(ERROR);

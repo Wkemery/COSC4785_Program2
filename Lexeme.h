@@ -15,7 +15,6 @@
 #define RELATIONOP 51
 #define SUMOP 52
 #define PRODUCTOP 53
-#define ASSIGNOP 54
 #define CLASS 100
 #define THIS 101
 #define IF 102
@@ -29,7 +28,17 @@
 #define NULLKEYWORD 110
 #define INT 111
 
-#define PUNCTUATION 12
+#define ASSIGNOP 120 
+#define DOTOP 121
+#define COMMA 122
+#define SEMICO 123
+#define LPAREN 124
+#define RPAREN 125
+#define LBRACK 126
+#define RBRACK 127
+#define LBRACE 128
+#define RBRACE 129
+
 #define NUM 14
 #define IDENTIFIER 17
 #define SPACE 10

@@ -46,4 +46,6 @@ word@#partoferror-varname
 @err||errnotcontinued
 @err&errcountinued
 @err&&errnotcontinued
-@err&errcont&errcont&&&rdone
+@err&errcont&errcont
+@err/*comment*/
+@this+
