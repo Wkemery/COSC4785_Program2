@@ -71,9 +71,16 @@ int main()
       }
       if(rtn == ERR)
       {
+        if(rtn == ERR) errCount++;
+        
         cout << setw(10) << token.line;
         cout << setw(10) << token.column << " " ;
         cout << setw(20) << token.value;
+        if(errCount > 20)
+        {
+          cout << setw(20) << " Too many Errors, exiting program" << endl;
+          exit(1);
+        }
         if(token.value.length() == 1) cout << setw(20) << "Single Char Err";
         else cout << setw(20) << "Multi Char Err";
         cout << endl;
@@ -85,14 +92,7 @@ int main()
         cout << setw(20) << pTable[rtn];
         if((rtn < 100) || (rtn > 150)) cout << setw(20) << token.value;
         cout << endl;   
-      }
-      
-      if(rtn == ERR) errCount++;
-      if(errCount > 20)
-      {
-        cout << "Error Processing Input: Too many Errors" << endl;
-        exit(1);
-      }
+      } 
         
     }
   

@@ -40,8 +40,6 @@ word@#partoferror-varname
 &&NotError
 'error45error
 =id
-"error(
-@error)
 @error|errcontinued
 @err||errnotcontinued
 @err&errcountinued
@@ -49,3 +47,8 @@ word@#partoferror-varname
 @err&errcont&errcont
 @err/*comment*/
 @this+
+@err|&errcont&|errc&&&newerr||errdone
+@
+@
+@
+@
