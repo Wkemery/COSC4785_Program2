@@ -34,7 +34,7 @@ int main()
   pTable.insert(std::pair<int, string>(WHILE, "WHILE"));
   pTable.insert(std::pair<int, string>(RETURN, "RETURN"));
   pTable.insert(std::pair<int, string>(PRINT, "PRINT"));
-  pTable.insert(std::pair<int, string>(PRINT, "READ"));
+  pTable.insert(std::pair<int, string>(READ, "READ"));
   pTable.insert(std::pair<int, string>(VOID, "VOID"));
   pTable.insert(std::pair<int, string>(NEW, "NEW"));
   pTable.insert(std::pair<int, string>(NULLKEYWORD, "NULL"));

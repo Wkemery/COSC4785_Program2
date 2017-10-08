@@ -223,7 +223,6 @@ INVALIDNONWORD [^!=<>+\-*\/;.,{}()% \t\n\[\]&\|]
   
   return VOID; 
 }
-:
 (new) {
   //new Keyword
   setToken(NULL, yylineno, column);
@@ -244,6 +243,7 @@ INVALIDNONWORD [^!=<>+\-*\/;.,{}()% \t\n\[\]&\|]
   //int keyword
   setToken(NULL, yylineno, column);
   column+= yyleng;
+  return INT;
 }
 
 \/\/.*\n {
